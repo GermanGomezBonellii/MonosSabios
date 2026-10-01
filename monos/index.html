@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Monos Sabios — Revista Nº 1</title>
+<meta name="description" content="Revista Monos Sabios Nº 1: recomendaciones, historietas, cuentos y más. Leela online.">
+<link rel="icon" type="image/png" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Outfit:wght@300;400;500;600;700&display=swap">
+<style>
+:root{--naranja:#FF4D0B;--tinta:#111;--crema:#F4E6D6;--gris:#1f1f1f;--sb:360px}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--naranja);color:var(--tinta);font-family:Outfit,Helvetica,Arial,sans-serif;overflow:hidden}
+button{font-family:inherit;cursor:pointer}
+a{color:var(--naranja)}a:hover{color:#ff7a45}
+.checker{background:repeating-conic-gradient(var(--tinta) 0 25%,var(--crema) 0 50%) 0 0/14px 14px;height:14px;flex-shrink:0}
+.app{display:flex;height:100vh;height:100dvh}
+
+/* ---------- panel lateral ---------- */
+.sb{width:var(--sb);flex-shrink:0;background:var(--tinta);color:var(--crema);display:flex;flex-direction:column;transition:margin-left .3s ease;z-index:20}
+.app.closed .sb{margin-left:calc(var(--sb) * -1)}
+.sb-head{display:flex;align-items:center;gap:14px;padding:20px 16px 16px 20px}
+.sb-head img{width:76px;height:76px;object-fit:contain}
+.brand{flex-grow:1}
+.brand b{display:block;font-family:Anton,Impact,sans-serif;font-weight:400;font-size:30px;line-height:1}
+.brand i{font-family:'EB Garamond',Georgia,serif;font-size:16px;color:#c9bdb0}
+.iconbtn{width:44px;height:44px;border:0;border-radius:10px;background:transparent;color:var(--crema);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.iconbtn:hover{background:#262626}
+.tabs{display:flex;padding:0 16px}
+.tab{flex:1;height:44px;border:0;border-bottom:2px solid #333;background:transparent;color:#bdb3a8;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.tab:hover{color:var(--crema)}
+.tab[aria-selected=true]{color:var(--naranja);border-bottom-color:var(--naranja)}
+.panel{flex-grow:1;overflow-y:auto;padding:14px 12px 16px;scrollbar-width:thin;scrollbar-color:var(--naranja) #1c1c1c}
+.panel[hidden]{display:none}
+.sec{display:flex;gap:14px;align-items:flex-start;width:100%;text-align:left;padding:12px 14px;border:0;border-radius:10px;background:transparent;color:var(--crema);margin-bottom:2px}
+.sec:hover{background:var(--gris)}
+.sec.on{background:var(--naranja);color:var(--tinta)}
+.sec .num{font-family:Anton,Impact,sans-serif;font-size:15px;min-width:34px;color:var(--naranja);padding-top:3px}
+.sec.on .num{color:var(--tinta)}
+.sec .t{display:block;font-size:16px;font-weight:600;line-height:1.25}
+.sec .by{display:block;font-size:12.5px;opacity:.75;margin-top:2px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:0 4px}
+.th{position:relative;padding:0;border:2px solid transparent;border-radius:6px;background:#1c1c1c;overflow:hidden;aspect-ratio:321/454}
+.th:hover{border-color:#8a8078}
+.th.on{border-color:var(--naranja)}
+.th img{width:100%;height:100%;object-fit:cover;display:block}
+.th span{position:absolute;left:4px;bottom:4px;background:var(--tinta);color:var(--crema);font-size:10px;font-weight:600;padding:1px 5px;border-radius:4px}
+.th.on span{background:var(--naranja);color:var(--tinta)}
+.about{display:flex;flex-direction:column;gap:16px;padding:6px 10px;font-size:15px;line-height:1.55;color:#e6dbcf}
+.about p{margin:0}
+.about .lead{font-family:'EB Garamond',Georgia,serif;font-size:22px;line-height:1.3;color:var(--crema)}
+.about b{color:var(--crema)}
+.card{border:1px solid var(--naranja);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.card h3{margin:0;font-family:Anton,Impact,sans-serif;font-weight:400;font-size:20px;color:var(--naranja);letter-spacing:.02em}
+.label{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#9c9186;font-weight:600}
+.teaser{margin:0 16px 14px;display:flex;align-items:center;gap:14px;padding:10px;border:0;border-radius:12px;background:var(--gris);color:var(--crema);text-align:left}
+.teaser:hover{background:#2a2a2a}
+.teaser img{width:44px;height:62px;object-fit:cover;border-radius:4px}
+.teaser small{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--naranja);font-weight:700}
+.teaser em{font-family:'EB Garamond',Georgia,serif;font-size:17px}
+
+/* ---------- lector ---------- */
+main{flex-grow:1;min-width:0;display:flex;flex-direction:column;position:relative}
+.top{height:76px;flex-shrink:0;display:flex;align-items:center;gap:18px;padding:0 32px}
+.open-sb{display:none;background:var(--tinta)}
+.app.closed .open-sb{display:flex}
+.kind{background:var(--tinta);color:var(--crema);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:5px 10px;border-radius:999px;white-space:nowrap}
+.titles{display:flex;align-items:baseline;gap:14px;flex-grow:1;min-width:0}
+.titles h1{margin:0;font-family:'EB Garamond',Georgia,serif;font-weight:400;font-size:34px;line-height:1;white-space:nowrap;text-transform:uppercase}
+.titles span{font-family:'EB Garamond',Georgia,serif;font-style:italic;font-size:19px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.seggroup{display:flex;background:var(--crema);border:2px solid var(--tinta);border-radius:999px;padding:3px;flex-shrink:0}
+.seg{height:36px;padding:0 14px;border:0;background:transparent;color:var(--tinta);font-size:13px;font-weight:600;border-radius:999px}
+.seg[aria-pressed=true]{background:var(--tinta);color:var(--crema)}
+.stage{flex-grow:1;min-height:0;display:flex;align-items:center;justify-content:center;gap:28px;padding:8px 24px 12px}
+.arrow{width:56px;height:56px;border-radius:50%;border:2px solid var(--tinta);background:var(--crema);color:var(--tinta);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:3px 3px 0 var(--tinta)}
+.arrow:hover:not(:disabled){background:var(--tinta);color:var(--crema)}
+.arrow:disabled{opacity:.3;cursor:default}
+.stage-in{flex-grow:1;align-self:stretch;min-width:0;display:flex;align-items:center;justify-content:center}
+/* ---------- visor con zoom ---------- */
+.magazine-viewport{position:relative;overflow:hidden;touch-action:pan-y}
+.magazine-transform-layer{transform-origin:50% 50%;transition:transform var(--zoom-ms,150ms) ease-out;will-change:transform}
+.magazine-viewport.dragging .magazine-transform-layer{transition:none}
+.magazine-viewport.zoomed .pg{cursor:grab}
+.magazine-viewport.dragging .pg{cursor:grabbing}
+.pg img{-webkit-user-drag:none;user-select:none}
+.zoom-badge{position:absolute;right:10px;bottom:10px;z-index:2;height:28px;padding:0 10px;border:2px solid var(--tinta);border-radius:999px;background:var(--crema);color:var(--tinta);font-size:12px;font-weight:700;box-shadow:2px 2px 0 var(--tinta)}
+.zoom-badge:hover{background:var(--tinta);color:var(--crema)}
+.zoom-badge[hidden]{display:none}
+.book{display:flex;gap:2px;background:var(--tinta);box-shadow:10px 10px 0 var(--tinta)}
+.pg{padding:0;border:0;background:#fff;display:block;flex-shrink:0}
+.pg img{width:100%;height:100%;object-fit:cover;display:block}
+.book.flip{animation:flip .28s ease}
+@keyframes flip{from{opacity:.25;transform:scale(.985)}to{opacity:1;transform:none}}
+.bottom{height:84px;flex-shrink:0;display:flex;align-items:center;gap:24px;padding:0 32px 6px}
+.counter{font-family:Anton,Impact,sans-serif;font-size:22px;min-width:150px;white-space:nowrap}
+.scrub{flex-grow:1;display:flex;flex-direction:column;gap:2px}
+.scrub label{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.scrub input{width:100%;accent-color:var(--tinta);height:28px;cursor:pointer}
+.ghost{height:40px;padding:0 16px;border:2px solid var(--tinta);border-radius:999px;background:transparent;color:var(--tinta);font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.ghost:hover{background:var(--tinta);color:var(--crema)}
+.hint{position:absolute;right:32px;bottom:84px;font-size:12px;opacity:.7}
+.backdrop{display:none}
+
+/* ---------- celular / tablet ---------- */
+@media (max-width: 900px){
+  body{overflow:auto}
+  .sb{position:fixed;inset:0 auto 0 0;width:min(88vw,360px);margin-left:0;transform:translateX(-100%);transition:transform .3s ease}
+  .app.mob-open .sb{transform:none}
+  .app.mob-open .backdrop{display:block;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:15}
+  .app.closed .sb{margin-left:0}
+  .open-sb{display:flex !important}
+  .top{height:auto;padding:12px 14px;flex-wrap:wrap;gap:10px}
+  .titles{flex-basis:100%;order:3;flex-direction:column;gap:2px}
+  .titles h1{font-size:26px;white-space:normal}
+  .titles span{font-size:16px}
+  .seggroup{margin-left:auto}
+  .seg{height:32px;padding:0 10px;font-size:12px}
+  .stage{gap:10px;padding:6px 10px}
+  .arrow{width:44px;height:44px}
+  .book{box-shadow:6px 6px 0 var(--tinta)}
+  .bottom{height:auto;flex-wrap:wrap;gap:12px;padding:10px 14px 16px}
+  .counter{min-width:0;font-size:18px}
+  .scrub{flex-basis:100%;order:3}
+  .ghost{height:36px;padding:0 12px}
+  .hint{display:none}
+}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="backdrop" id="backdrop"></div>
+  <aside class="sb" id="sb" aria-label="Índice de la revista">
+    <div class="sb-head">
+      <img src="img/logo.png" alt="Sello Monos Sabios Editorial">
+      <div class="brand"><b>MONOS SABIOS</b><i>Revista · Número 1</i></div>
+      <button class="iconbtn" id="closeSb" aria-label="Ocultar panel">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+    </div>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="indice" aria-selected="true">Índice</button>
+      <button class="tab" role="tab" data-tab="paginas" aria-selected="false">Páginas</button>
+      <button class="tab" role="tab" data-tab="nosotros" aria-selected="false">Nosotros</button>
+    </div>
+    <div class="panel" id="p-indice" role="tabpanel"></div>
+    <div class="panel" id="p-paginas" role="tabpanel" hidden><div class="grid" id="grid"></div></div>
+    <div class="panel" id="p-nosotros" role="tabpanel" hidden>
+      <div class="about">
+        <p class="lead">Recomendaciones, historietas, cuentos y más — hechos a mano por una editorial independiente.</p>
+        <p>Esta primera edición fue escrita, dibujada, diseñada y planificada por los tres monos fundadores: <b>Tahiel González Leis</b>, <b>Vito Fortino Blanco</b> y <b>Juan Cruz Arias Pereyra</b>, con la ayuda de Eugenio y Giovanna Colliní.</p>
+        <p>Concebida en el “Hábitat” entre febrero y junio de 2026.</p>
+        <div class="card">
+          <h3>CONVOCATORIA ABIERTA PRONTO</h3>
+          <div>En las próximas ediciones habrá más artistas. ¿Querés publicar en el Nº 2?</div>
+          <a href="#">[LINK AL FORMULARIO] →</a>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div class="label">Contacto</div>
+          <a href="#">[@INSTAGRAM]</a>
+          <a href="#">[EMAIL DE CONTACTO]</a>
+        </div>
+      </div>
+    </div>
+    <button class="teaser" id="teaser">
+      <img src="" alt="" id="teaserImg">
+      <span style="flex-grow:1"><small>Próximamente · Nº 2</small><em>Manténgase al aire…</em></span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+    <div class="checker"></div>
+  </aside>
+
+  <main>
+    <div class="checker"></div>
+    <header class="top">
+      <button class="iconbtn open-sb" id="openSb" aria-label="Mostrar índice">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <span class="kind" id="kind"></span>
+      <div class="titles"><h1 id="title"></h1><span id="by"></span></div>
+      <div class="seggroup" role="group" aria-label="Vista">
+        <button class="seg" id="mDouble" aria-pressed="true">Doble página</button>
+        <button class="seg" id="mSingle" aria-pressed="false">Una página</button>
+      </div>
+    </header>
+    <section class="stage" id="stage">
+      <button class="arrow" id="prev" aria-label="Página anterior">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="stage-in magazine-viewport" id="stageIn">
+        <div class="magazine-transform-layer" id="zoomLayer"><div class="book" id="book"></div></div>
+        <button class="zoom-badge" id="zoomBadge" hidden aria-label="Volver al 100%" title="Volver al 100%">100%</button>
+      </div>
+      <button class="arrow" id="next" aria-label="Página siguiente">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </section>
+    <footer class="bottom">
+      <div class="counter" id="counter"></div>
+      <div class="scrub">
+        <label for="range">Ir a página <span style="font-weight:400;letter-spacing:0;text-transform:none;opacity:.75">· también con las flechas ← → del teclado</span></label>
+        <input id="range" type="range" min="1" step="1" value="1">
+      </div>
+      <button class="ghost" id="bIndice">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Índice
+      </button>
+      <button class="ghost" id="bPaginas">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Páginas
+      </button>
+    </footer>
+  </main>
+</div>
+
+<script>
+const PAGES = ["img/paginas/p01.webp", "img/paginas/p02.webp", "img/paginas/p03.webp", "img/paginas/p04.webp", "img/paginas/p05.webp", "img/paginas/p06.webp", "img/paginas/p07.webp", "img/paginas/p08.webp", "img/paginas/p09.webp", "img/paginas/p10.webp", "img/paginas/p11.webp", "img/paginas/p12.webp", "img/paginas/p13.webp", "img/paginas/p14.webp", "img/paginas/p15.webp", "img/paginas/p16.webp", "img/paginas/p17.webp", "img/paginas/p18.webp", "img/paginas/p19.webp", "img/paginas/p20.webp", "img/paginas/p21.webp", "img/paginas/p22.webp", "img/paginas/p23.webp", "img/paginas/p24.webp", "img/paginas/p25.webp", "img/paginas/p26.webp", "img/paginas/p27.webp", "img/paginas/p28.webp", "img/paginas/p29.webp", "img/paginas/p30.webp", "img/paginas/p31.webp", "img/paginas/p32.webp", "img/paginas/p33.webp", "img/paginas/p34.webp", "img/paginas/p35.webp", "img/paginas/p36.webp", "img/paginas/p37.webp", "img/paginas/p38.webp", "img/paginas/p39.webp", "img/paginas/p40.webp", "img/paginas/p41.webp", "img/paginas/p42.webp", "img/paginas/p43.webp", "img/paginas/p44.webp", "img/paginas/p45.webp", "img/paginas/p46.webp", "img/paginas/p47.webp", "img/paginas/p48.webp", "img/paginas/p49.webp", "img/paginas/p50.webp", "img/paginas/p51.webp", "img/paginas/p52.webp", "img/paginas/p53.webp", "img/paginas/p54.webp", "img/paginas/p55.webp", "img/paginas/p56.webp", "img/paginas/p57.webp", "img/paginas/p58.webp", "img/paginas/p59.webp", "img/paginas/p60.webp", "img/paginas/p61.webp", "img/paginas/p62.webp", "img/paginas/p63.webp", "img/paginas/p64.webp", "img/paginas/p65.webp", "img/paginas/p66.webp", "img/paginas/p67.webp", "img/paginas/p68.webp", "img/paginas/p69.webp", "img/paginas/p70.webp"];
+const THUMBS = ["img/miniaturas/t01.webp", "img/miniaturas/t02.webp", "img/miniaturas/t03.webp", "img/miniaturas/t04.webp", "img/miniaturas/t05.webp", "img/miniaturas/t06.webp", "img/miniaturas/t07.webp", "img/miniaturas/t08.webp", "img/miniaturas/t09.webp", "img/miniaturas/t10.webp", "img/miniaturas/t11.webp", "img/miniaturas/t12.webp", "img/miniaturas/t13.webp", "img/miniaturas/t14.webp", "img/miniaturas/t15.webp", "img/miniaturas/t16.webp", "img/miniaturas/t17.webp", "img/miniaturas/t18.webp", "img/miniaturas/t19.webp", "img/miniaturas/t20.webp", "img/miniaturas/t21.webp", "img/miniaturas/t22.webp", "img/miniaturas/t23.webp", "img/miniaturas/t24.webp", "img/miniaturas/t25.webp", "img/miniaturas/t26.webp", "img/miniaturas/t27.webp", "img/miniaturas/t28.webp", "img/miniaturas/t29.webp", "img/miniaturas/t30.webp", "img/miniaturas/t31.webp", "img/miniaturas/t32.webp", "img/miniaturas/t33.webp", "img/miniaturas/t34.webp", "img/miniaturas/t35.webp", "img/miniaturas/t36.webp", "img/miniaturas/t37.webp", "img/miniaturas/t38.webp", "img/miniaturas/t39.webp", "img/miniaturas/t40.webp", "img/miniaturas/t41.webp", "img/miniaturas/t42.webp", "img/miniaturas/t43.webp", "img/miniaturas/t44.webp", "img/miniaturas/t45.webp", "img/miniaturas/t46.webp", "img/miniaturas/t47.webp", "img/miniaturas/t48.webp", "img/miniaturas/t49.webp", "img/miniaturas/t50.webp", "img/miniaturas/t51.webp", "img/miniaturas/t52.webp", "img/miniaturas/t53.webp", "img/miniaturas/t54.webp", "img/miniaturas/t55.webp", "img/miniaturas/t56.webp", "img/miniaturas/t57.webp", "img/miniaturas/t58.webp", "img/miniaturas/t59.webp", "img/miniaturas/t60.webp", "img/miniaturas/t61.webp", "img/miniaturas/t62.webp", "img/miniaturas/t63.webp", "img/miniaturas/t64.webp", "img/miniaturas/t65.webp", "img/miniaturas/t66.webp", "img/miniaturas/t67.webp", "img/miniaturas/t68.webp", "img/miniaturas/t69.webp", "img/miniaturas/t70.webp"];
+const SECTIONS = [
+  { title: "Portada", by: "Revista Monos Sabios · Nº 1", kind: "Nº 1", from: 1, to: 2 },
+  { title: "Bienvenida e índice", by: "“Les deseamos una buena, atenta y tranquila lectura”", kind: "Editorial", from: 3, to: 3 },
+  { title: "Recomendaciones", by: "Vito · Tahiel · Juan", kind: "Recomendaciones", from: 4, to: 6 },
+  { title: "La reseña de Los Monos Sabios", by: "The French Dispatch", kind: "Reseña", from: 7, to: 7 },
+  { title: "Intermisión 01", by: "“El Mono Sabio no vive en sus ideas, las materializa.”", kind: "Intermisión", from: 8, to: 8 },
+  { title: "Méndigo", by: "Capítulo 1", kind: "Historieta", from: 9, to: 13 },
+  { title: "Máscaras", by: "Capítulo 1", kind: "Historieta", from: 14, to: 26 },
+  { title: "Dinima & The World", by: "Historieta a color", kind: "Historieta", from: 27, to: 39 },
+  { title: "Astromelia", by: "El sueño de los despiertos", kind: "Historieta", from: 40, to: 49 },
+  { title: "Intermisión 02", by: "“…por el simple gusto de caminar.”", kind: "Intermisión", from: 50, to: 50 },
+  { title: "El Cuervo Desgajado", by: "Vito Fortino Blanco", kind: "Cuento", from: 51, to: 57 },
+  { title: "El Palacio Sin Tiempo", by: "Juan Cruz Arias Pereyra", kind: "Relato", from: 58, to: 66 },
+  { title: "Cierre y Nº 2", by: "Los Monos Sabios cierran el telón, por esta vez", kind: "Cierre", from: 67, to: 70 }
+];
+const N = PAGES.length;
+const $ = id => document.getElementById(id);
+const app = $("app"), mq = matchMedia("(max-width: 900px)");
+let p = 1, mode = mq.matches ? "single" : "double";
+const hashP = parseInt((location.hash.match(/p=(\d+)/) || [])[1], 10);
+if (hashP) p = Math.min(N, Math.max(1, hashP));
+
+function vis() {
+  if (mode === "single") return [p];
+  if (p === 1) return [1];
+  const l = p % 2 === 0 ? p : p - 1;
+  return l + 1 <= N ? [l, l + 1] : [l];
+}
+function go(n) {
+  p = Math.max(1, Math.min(N, n));
+  render(true);
+  if (mq.matches) app.classList.remove("mob-open");
+}
+function next() { const v = vis(); go(mode === "single" ? p + 1 : v[v.length - 1] + 1); }
+function prev() { const v = vis(); go(mode === "single" ? p - 1 : v[0] - 1); }
+
+// índice
+SECTIONS.forEach((s, i) => {
+  const b = document.createElement("button");
+  b.className = "sec";
+  b.innerHTML = `<span class="num">${String(s.from).padStart(2, "0")}</span><span><span class="t"></span><span class="by"></span></span>`;
+  b.querySelector(".t").textContent = s.title;
+  b.querySelector(".by").textContent = s.by;
+  b.onclick = () => go(s.from);
+  s.el = b;
+  $("p-indice").appendChild(b);
+});
+// miniaturas
+const thumbs = PAGES.map((src, i) => {
+  const b = document.createElement("button");
+  b.className = "th";
+  b.setAttribute("aria-label", "Ir a la página " + (i + 1));
+  b.innerHTML = `<img alt="" loading="lazy"><span>${i + 1}</span>`;
+  b.querySelector("img").src = THUMBS[i];
+  b.onclick = () => go(i + 1);
+  $("grid").appendChild(b);
+  return b;
+});
+$("teaserImg").src = THUMBS[67];
+$("teaser").onclick = () => go(68);
+
+function render(anim) {
+  if (typeof resetZoom === "function") resetZoom(true);
+  const v = vis(), first = v[0], last = v[v.length - 1];
+  const book = $("book");
+  book.innerHTML = "";
+  v.forEach((n, i) => {
+    const b = document.createElement("button");
+    const isLeft = v.length === 2 && i === 0;
+    b.className = "pg";
+    b.setAttribute("aria-label", "Página " + n + (isLeft ? " — volver" : " — avanzar"));
+    b.innerHTML = `<img alt="Página ${n}" draggable="false">`;
+    b.querySelector("img").src = PAGES[n - 1];
+    b.onclick = isLeft ? prev : next;
+    book.appendChild(b);
+  });
+  fit();
+  if (anim) { book.classList.remove("flip"); void book.offsetWidth; book.classList.add("flip"); }
+  let cur = SECTIONS[0];
+  SECTIONS.forEach(s => {
+    if (first >= s.from && first <= s.to) cur = s;
+    s.el.classList.toggle("on", v.some(n => n >= s.from && n <= s.to));
+  });
+  $("kind").textContent = cur.kind;
+  $("title").textContent = cur.title;
+  $("by").textContent = cur.by;
+  thumbs.forEach((t, i) => t.classList.toggle("on", v.includes(i + 1)));
+  $("counter").textContent = (v.length === 2 ? `Págs. ${first}–${last}` : `Pág. ${first}`) + ` / ${N}`;
+  $("range").max = N; $("range").value = first;
+  $("prev").disabled = first <= 1;
+  $("next").disabled = last >= N;
+  $("mDouble").setAttribute("aria-pressed", mode === "double");
+  $("mSingle").setAttribute("aria-pressed", mode === "single");
+  history.replaceState(null, "", "#p=" + first);
+  // precarga de las páginas siguientes
+  [last + 1, last + 2].forEach(n => { if (n <= N) new Image().src = PAGES[n - 1]; });
+}
+
+const RATIO = 660 / 933;
+function fit() {
+  const box = $("stageIn"), k = vis().length;
+  const w = box.clientWidth - 12, h = box.clientHeight - 12;
+  const ph = Math.max(100, Math.min(h, (w - (k - 1) * 2) / (k * RATIO)));
+  document.querySelectorAll(".pg").forEach(el => { el.style.height = ph + "px"; el.style.width = ph * RATIO + "px"; });
+}
+addEventListener("resize", fit);
+$("sb").addEventListener("transitionend", fit);
+
+function setTab(name) {
+  document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", t.dataset.tab === name));
+  ["indice", "paginas", "nosotros"].forEach(k => $("p-" + k).hidden = k !== name);
+}
+function openSb(tab) {
+  if (tab) setTab(tab);
+  if (mq.matches) app.classList.add("mob-open"); else app.classList.remove("closed");
+}
+document.querySelectorAll(".tab").forEach(t => t.onclick = () => setTab(t.dataset.tab));
+$("closeSb").onclick = () => mq.matches ? app.classList.remove("mob-open") : app.classList.add("closed");
+$("openSb").onclick = () => openSb();
+$("backdrop").onclick = () => app.classList.remove("mob-open");
+$("bIndice").onclick = () => openSb("indice");
+$("bPaginas").onclick = () => openSb("paginas");
+$("prev").onclick = prev;
+$("next").onclick = next;
+$("mDouble").onclick = () => { mode = "double"; render(true); };
+$("mSingle").onclick = () => { mode = "single"; render(true); };
+$("range").oninput = e => go(+e.target.value);
+document.addEventListener("keydown", e => {
+  if (e.target.tagName === "INPUT") return;
+  if (e.key === "ArrowRight") next();
+  if (e.key === "ArrowLeft") prev();
+  if ((e.key === "ArrowUp" || e.key === "ArrowDown") && zoom.z > 1) {
+    e.preventDefault();
+    panBy(0, e.key === "ArrowUp" ? ZOOM_CONFIG.keyPanStep : -ZOOM_CONFIG.keyPanStep, true);
+  }
+  if (e.key === "Escape") app.classList.remove("mob-open");
+});
+// deslizar con el dedo en el celular
+let tx = null;
+$("stage").addEventListener("touchstart", e => { tx = e.touches[0].clientX; }, { passive: true });
+$("stage").addEventListener("touchend", e => {
+  if (tx === null) return;
+  const dx = e.changedTouches[0].clientX - tx; tx = null;
+  if (Math.abs(dx) > 50 && zoom.z === 1) dx < 0 ? next() : prev();
+});
+/* =====================================================================
+   ZOOM Y DESPLAZAMIENTO DEL VISOR
+   viewport  = #stageIn   (overflow: hidden, tamaño fijo del área central)
+   capa      = #zoomLayer (translate + scale; el spread completo es una sola superficie)
+   ===================================================================== */
+const ZOOM_CONFIG = {
+  minZoom: 1,                // zoom mínimo (100%)
+  maxZoom: 4,                // zoom máximo (400%)
+  wheelSensitivity: 0.0015,  // cuánto zoom por unidad de rueda (100 de deltaY ≈ 15%)
+  keyPanStep: 100,           // px que mueven ↑ / ↓
+  transitionMs: 150          // duración de la transición del zoom
+};
+const zoom = { z: 1, x: 0, y: 0 };   // estado: escala y desplazamiento en px de pantalla
+const viewport = $("stageIn"), layer = $("zoomLayer"), badge = $("zoomBadge");
+viewport.style.setProperty("--zoom-ms", ZOOM_CONFIG.transitionMs + "ms");
+
+// Límites del desplazamiento:
+// - si la revista ampliada es más grande que el visor, sus bordes no pueden entrar en el visor
+//   (se recorre toda la página, pero nunca queda fondo vacío de más);
+// - si es más chica en algún eje, puede moverse en ese eje pero sin salirse del visor.
+function clampPan() {
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  const w = layer.offsetWidth * zoom.z, h = layer.offsetHeight * zoom.z;
+  const mx = Math.abs(w - vw) / 2, my = Math.abs(h - vh) / 2;
+  zoom.x = Math.min(mx, Math.max(-mx, zoom.x));
+  zoom.y = Math.min(my, Math.max(-my, zoom.y));
+}
+function applyZoom(animate) {
+  if (zoom.z <= ZOOM_CONFIG.minZoom + 0.001) { zoom.z = ZOOM_CONFIG.minZoom; zoom.x = 0; zoom.y = 0; }
+  clampPan();
+  viewport.classList.toggle("dragging", !animate);
+  layer.style.transform = zoom.z === 1 && !zoom.x && !zoom.y ? "" :
+    `translate(${zoom.x}px, ${zoom.y}px) scale(${zoom.z})`;
+  viewport.classList.toggle("zoomed", zoom.z > 1);
+  badge.hidden = zoom.z === 1;
+  badge.textContent = Math.round(zoom.z * 100) + "%";
+}
+function resetZoom(instant) {
+  zoom.z = 1; zoom.x = 0; zoom.y = 0;
+  applyZoom(!instant);
+}
+// Zoom manteniendo fijo el punto (clientX, clientY) de la pantalla. Reutilizable para pinch.
+function zoomAt(clientX, clientY, newZ, animate = true) {
+  newZ = Math.min(ZOOM_CONFIG.maxZoom, Math.max(ZOOM_CONFIG.minZoom, newZ));
+  const r = viewport.getBoundingClientRect();
+  const cx = r.left + r.width / 2, cy = r.top + r.height / 2;   // centro de la capa sin transformar
+  const dx = (clientX - cx - zoom.x) / zoom.z;                  // punto bajo el cursor, en coords. de la revista
+  const dy = (clientY - cy - zoom.y) / zoom.z;
+  zoom.x = clientX - cx - newZ * dx;
+  zoom.y = clientY - cy - newZ * dy;
+  zoom.z = newZ;
+  applyZoom(animate);
+}
+function panBy(dx, dy, animate = false) {
+  if (zoom.z === 1) return;
+  zoom.x += dx; zoom.y += dy;
+  applyZoom(animate);
+}
+
+// Rueda: solo dentro del visor (no se bloquea la rueda en el resto de la web)
+viewport.addEventListener("wheel", e => {
+  e.preventDefault();
+  const delta = e.deltaMode === 1 ? e.deltaY * 33 : e.deltaY;   // líneas → px (Firefox)
+  zoomAt(e.clientX, e.clientY, zoom.z * Math.exp(-delta * ZOOM_CONFIG.wheelSensitivity));
+}, { passive: false });
+
+// Arrastre con mouse (o lápiz) cuando hay zoom
+let drag = null, dragMoved = false;
+viewport.addEventListener("pointerdown", e => {
+  if (zoom.z === 1 || e.button !== 0 || e.pointerType === "touch") return;
+  if (e.target.closest(".zoom-badge")) return;
+  e.preventDefault();
+  drag = { id: e.pointerId, lx: e.clientX, ly: e.clientY };
+  dragMoved = false;
+  viewport.setPointerCapture(e.pointerId);
+  viewport.classList.add("dragging");
+});
+viewport.addEventListener("pointermove", e => {
+  if (!drag || e.pointerId !== drag.id) return;
+  const dx = e.clientX - drag.lx, dy = e.clientY - drag.ly;
+  if (Math.abs(dx) + Math.abs(dy) > 0) dragMoved = true;
+  drag.lx = e.clientX; drag.ly = e.clientY;
+  panBy(dx, dy, false);
+});
+function endDrag(e) {
+  if (!drag || e.pointerId !== drag.id) return;
+  drag = null;
+  viewport.classList.remove("dragging");
+}
+viewport.addEventListener("pointerup", endDrag);
+viewport.addEventListener("pointercancel", endDrag);
+
+// Con zoom, un clic sobre la página no cambia de página (se usa para arrastrar)
+viewport.addEventListener("click", e => {
+  if (e.target.closest(".zoom-badge")) return;
+  if (zoom.z > 1 || dragMoved) { e.stopPropagation(); e.preventDefault(); dragMoved = false; }
+}, true);
+badge.addEventListener("click", () => resetZoom(false));
+
+// Si cambia el tamaño de la ventana, recalcular límites
+addEventListener("resize", () => applyZoom(false));
+$("sb").addEventListener("transitionend", () => applyZoom(false));
+
+render(false);
+</script>
+</body>
+</html>
