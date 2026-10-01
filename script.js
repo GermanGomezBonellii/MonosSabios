@@ -148,12 +148,17 @@ document.addEventListener("keydown", e => {
   }
 });
 // deslizar con el dedo en el celular
-let tx = null;
-$("stage").addEventListener("touchstart", e => { tx = e.touches[0].clientX; }, { passive: true });
+let tx = null, ty = null, tt = 0;
+$("stage").addEventListener("touchstart", e => {
+  if (e.touches.length !== 1) { tx = null; return; }        // dos dedos: no es un deslizamiento
+  tx = e.touches[0].clientX; ty = e.touches[0].clientY; tt = Date.now();
+}, { passive: true });
 $("stage").addEventListener("touchend", e => {
   if (tx === null) return;
-  const dx = e.changedTouches[0].clientX - tx; tx = null;
-  if (Math.abs(dx) > 50 && zoom.z === 1) dx < 0 ? next() : prev();
+  const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty; tx = null;
+  const fast = Date.now() - tt < 300;                         // un toque rápido alcanza con menos recorrido
+  const horizontal = Math.abs(dx) > Math.abs(dy) * 1.2;
+  if (horizontal && Math.abs(dx) > (fast ? 30 : 50) && zoom.z === 1) dx < 0 ? next() : prev();
 });
 /* =====================================================================
    ZOOM Y DESPLAZAMIENTO DEL VISOR
