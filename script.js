@@ -70,7 +70,7 @@ function render(anim) {
     const b = document.createElement("button");
     const isLeft = v.length === 2 && i === 0;
     b.className = "pg";
-    b.setAttribute("aria-label", "Página " + n + (isLeft ? " — volver" : " — avanzar"));
+    b.setAttribute("aria-label", "Página " + n + (isLeft ? ", volver" : ", avanzar"));
     b.innerHTML = `<img alt="Página ${n}" draggable="false">`;
     b.querySelector("img").src = PAGES[n - 1];
     b.onclick = isLeft ? prev : next;
@@ -88,7 +88,7 @@ function render(anim) {
   $("byText").textContent = cur.by;
   fitInlineHeadings();
   thumbs.forEach((t, i) => t.classList.toggle("on", v.includes(i + 1)));
-  $("counter").textContent = (v.length === 2 ? `Págs. ${first}–${last}` : `Pág. ${first}`) + ` / ${N}`;
+  $("counter").textContent = (v.length === 2 ? `Págs. ${first}-${last}` : `Pág. ${first}`) + ` / ${N}`;
   $("range").max = N; $("range").value = first;
   $("prev").disabled = first <= 1;
   $("next").disabled = last >= N;
