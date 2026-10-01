@@ -22,6 +22,9 @@ let p = 1, mode = mq.matches ? "single" : "double";
 const hashP = parseInt((location.hash.match(/p=(\d+)/) || [])[1], 10);
 if (hashP) p = Math.min(N, Math.max(1, hashP));
 
+// Estado del efecto de pase de página (ver bloque PASE DE PÁGINA al final)
+let pendingFlip = null, lastVis = null, lastMode = null;
+
 function vis() {
   if (mode === "single") return [p];
   if (p === 1) return [1];
@@ -33,8 +36,8 @@ function go(n) {
   render(true);
   if (mq.matches) app.classList.remove("mob-open");
 }
-function next() { const v = vis(); go(mode === "single" ? p + 1 : v[v.length - 1] + 1); }
-function prev() { const v = vis(); go(mode === "single" ? p - 1 : v[0] - 1); }
+function next() { const v = vis(); pendingFlip = "next"; go(mode === "single" ? p + 1 : v[v.length - 1] + 1); }
+function prev() { const v = vis(); pendingFlip = "prev"; go(mode === "single" ? p - 1 : v[0] - 1); }
 
 // índice
 SECTIONS.forEach((s, i) => {
@@ -63,6 +66,7 @@ $("teaser").onclick = () => go(68);
 
 function render(anim) {
   if (typeof resetZoom === "function") resetZoom(true);
+  const flipDir = pendingFlip; pendingFlip = null;
   const v = vis(), first = v[0], last = v[v.length - 1];
   const book = $("book");
   book.innerHTML = "";
@@ -77,19 +81,20 @@ function render(anim) {
     book.appendChild(b);
   });
   fit();
-  if (anim) { book.classList.remove("flip"); void book.offsetWidth; book.classList.add("flip"); }
+  const flipped = anim && flipDir && pageTurn(flipDir, lastVis, lastMode, v);
+  if (anim && !flipped) { book.classList.remove("flip"); void book.offsetWidth; book.classList.add("flip"); }
+  lastVis = v; lastMode = mode;
   let cur = SECTIONS[0];
   SECTIONS.forEach(s => {
     if (first >= s.from && first <= s.to) cur = s;
     s.el.classList.toggle("on", v.some(n => n >= s.from && n <= s.to));
   });
-  $("kind").textContent = cur.kind;
-  $("titleText").textContent = cur.title;
-  $("byText").textContent = cur.by;
   fitInlineHeadings();
   thumbs.forEach((t, i) => t.classList.toggle("on", v.includes(i + 1)));
-  $("counter").textContent = (v.length === 2 ? `Págs. ${first}-${last}` : `Pág. ${first}`) + ` / ${N}`;
+  $("counterText").textContent = (v.length === 2 ? `Págs. ${first}-${last}` : `Pág. ${first}`) + ` / ${N}`;
+  fitInlineHeadings();
   $("range").max = N; $("range").value = first;
+  $("range").style.setProperty("--fill", ((first - 1) / (N - 1) * 100) + "%");
   $("prev").disabled = first <= 1;
   $("next").disabled = last >= N;
   $("mDouble").setAttribute("aria-pressed", mode === "double");
@@ -342,3 +347,71 @@ function wakeControls(delay = FULLSCREEN_CONFIG.idleHideMs) {
 document.addEventListener("keydown", () => wakeControls());
 
 render(false);
+
+/* =====================================================================
+   PASE DE PÁGINA (efecto flipbook)
+   Solo al avanzar/retroceder de a una página o spread (flechas, teclado, clic, deslizar).
+   Saltos desde el índice, la barra o miniaturas usan el fundido de siempre.
+   Usa únicamente transform/opacity sobre 2 o 3 capas temporales, que se borran al terminar.
+   ===================================================================== */
+const FLIP_CONFIG = {
+  durationMs: 650,     // duración del giro de la hoja
+  easing: "cubic-bezier(.45,.05,.25,1)"
+};
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
+let flipCleanup = null;
+
+function pageTurn(dir, oldV, oldMode, newV) {
+  if (flipCleanup) flipCleanup();                       // si había un giro en curso, se termina ya
+  if (reduceMotion.matches || !oldV || oldMode !== mode || oldV.length !== newV.length) return false;
+  const adjacent = dir === "next" ? newV[0] === oldV[oldV.length - 1] + 1 : newV[newV.length - 1] === oldV[0] - 1;
+  if (!adjacent) return false;
+
+  const pg = $("book").querySelector(".pg");
+  const pw = pg.offsetWidth, ph = pg.offsetHeight;
+  const layer = document.createElement("div");
+  layer.className = "flip-layer";
+  const face = (n, cls) => `<div class="flip-face ${cls}"><img src="${PAGES[n - 1]}" alt="" draggable="false"></div>`;
+  const box = (left) => `left:${left}px;width:${pw}px;height:${ph}px`;
+  let leafHTML, keyframes;
+
+  if (newV.length === 2) {
+    // Doble página: gira la hoja sobre el lomo; del otro lado queda la página vieja hasta que la tapa la hoja
+    const [oL, oR] = oldV, [nL, nR] = newV;
+    if (dir === "next") {
+      layer.innerHTML = `<div class="flip-static" style="${box(0)}">${face(oL, "")}</div>` +
+        `<div class="flip-leaf" style="${box(pw + 2)};transform-origin:-1px 50%">${face(oR, "flip-front")}${face(nL, "flip-back")}</div>`;
+      keyframes = [{ transform: "rotateY(0deg)" }, { transform: "rotateY(-180deg)" }];
+    } else {
+      layer.innerHTML = `<div class="flip-static" style="${box(pw + 2)}">${face(oR, "")}</div>` +
+        `<div class="flip-leaf" style="${box(0)};transform-origin:calc(100% + 1px) 50%">${face(oL, "flip-front")}${face(nR, "flip-back")}</div>`;
+      keyframes = [{ transform: "rotateY(0deg)" }, { transform: "rotateY(180deg)" }];
+    }
+  } else {
+    // Una página: la hoja vieja se levanta desde el borde izquierdo (avanzar) o la nueva baja sobre la vieja (retroceder)
+    const o = oldV[0], n = newV[0];
+    if (dir === "next") {
+      layer.innerHTML = `<div class="flip-leaf" style="${box(0)};transform-origin:0 50%">${face(o, "flip-front")}</div>`;
+      keyframes = [{ transform: "rotateY(0deg)", opacity: 1 }, { transform: "rotateY(-95deg)", opacity: 1, offset: .9 }, { transform: "rotateY(-100deg)", opacity: 0 }];
+    } else {
+      layer.innerHTML = `<div class="flip-static" style="${box(0)}">${face(o, "")}</div>` +
+        `<div class="flip-leaf" style="${box(0)};transform-origin:0 50%">${face(n, "flip-front")}</div>`;
+      keyframes = [{ transform: "rotateY(-100deg)", opacity: 0 }, { transform: "rotateY(-95deg)", opacity: 1, offset: .1 }, { transform: "rotateY(0deg)", opacity: 1 }];
+    }
+  }
+
+  $("zoomLayer").appendChild(layer);
+  const leaf = layer.querySelector(".flip-leaf");
+  const opts = { duration: FLIP_CONFIG.durationMs, easing: FLIP_CONFIG.easing, fill: "forwards" };
+  const anim = leaf.animate(keyframes, opts);
+  const shades = [...layer.querySelectorAll(".flip-leaf .flip-face")].map(f =>
+    f.animate([{ "--flip-shade": 0 }, { "--flip-shade": 1, offset: .5 }, { "--flip-shade": 0 }], opts));
+  let done = false;
+  flipCleanup = () => {
+    if (done) return; done = true;
+    anim.cancel(); shades.forEach(a => a.cancel());
+    layer.remove(); flipCleanup = null;
+  };
+  anim.onfinish = flipCleanup;
+  return true;
+}
